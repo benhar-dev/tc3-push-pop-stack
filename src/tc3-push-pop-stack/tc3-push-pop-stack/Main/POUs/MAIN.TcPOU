@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="MAIN" Id="{d764e607-8c77-441b-9951-16fc2e18c7ff}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR
+	
+	queue : Queue;
+	
+	position1 : Coordinate3D :=  (x:=3, y:=8, z:=-1);
+	position2 : Coordinate3D :=  (x:=9, y:=1, z:=0);
+	
+	trigger : BOOL;
+	
+	size : UINT;
+	currentPosition : Coordinate3D;
+	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF trigger THEN
+	
+	trigger := FALSE;
+	
+	queue.Push(position1);
+	queue.Push(position2);
+	
+	size := queue.Size(); // size 2
+	queue.Pop(currentPosition); // (x:=3, y:=8, z:=-1)
+	size := queue.Size(); // size 1
+
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

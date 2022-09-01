@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <Itf Name="I_QueueNode" Id="{6b75ffa8-a79b-4321-92d0-ec8c46d024a4}">
+    <Declaration><![CDATA[INTERFACE I_QueueNode]]></Declaration>
+    <Method Name="Destroy" Id="{f562c5a5-3c44-4553-882f-168d43d6e471}">
+      <Declaration><![CDATA[METHOD PUBLIC Destroy
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="Get" Id="{2ff680fb-9677-474d-b509-5468772db183}">
+      <Declaration><![CDATA[METHOD PUBLIC Get : BOOL;
+VAR_INPUT
+	Destination : ANY;
+END_VAR
+]]></Declaration>
+    </Method>
+    <Property Name="Next" Id="{00d54bf8-d054-45d2-894d-565e6e8eb72c}">
+      <Declaration><![CDATA[PROPERTY PUBLIC Next : I_QueueNode]]></Declaration>
+      <Get Name="Get" Id="{aa775674-5714-49ad-855b-fbddd8492b66}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{37c75405-a241-4f41-8f32-04a8c89d1da6}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+  </Itf>
+</TcPlcObject>

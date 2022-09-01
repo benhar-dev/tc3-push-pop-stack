@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="Queue" Id="{1560f4e8-0d30-4cd0-8a35-4cb789c690a0}" SpecialFunc="None">
+    <Declaration><![CDATA[{attribute 'linkalways'}
+{attribute 'no_explicit_call' := 'do not call this POU directly'}
+FUNCTION_BLOCK Queue
+VAR
+	head : I_QueueNode;
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Pop" Id="{1ebc705c-ca50-401d-8bfc-812a17ac732a}">
+      <Declaration><![CDATA[METHOD PUBLIC Pop : BOOL;
+VAR_INPUT
+	Destination : ANY;
+END_VAR
+VAR
+	next : I_QueueNode;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF head = 0 THEN
+	RETURN;
+END_IF
+
+next := head.Next;
+
+Pop := head.Get(Destination);
+head.Destroy();
+head := next;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Push" Id="{5f56d2fb-90cb-4948-8ebe-7045801f934b}">
+      <Declaration><![CDATA[METHOD PUBLIC Push
+VAR_INPUT
+	Item : ANY;
+END_VAR
+VAR
+	pQueueNode : POINTER TO QueueNode;
+	last : I_QueueNode;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[pQueueNode := __NEW(QueueNode(Source := Item)); 
+
+IF head = 0 THEN	
+	head := pQueueNode^; 
+	RETURN;
+END_IF
+
+last := head; 
+
+WHILE last.Next <> 0 DO
+	last := last.next; 
+END_WHILE;
+	
+last.next := pQueueNode^;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Size" Id="{80cdf951-b102-45e6-9833-c35c6ce7d613}">
+      <Declaration><![CDATA[METHOD PUBLIC Size : UINT
+VAR
+	currentCount : UINT;
+	currentNode : I_QueueNode;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[currentCount := 0;
+currentNode := head;
+
+WHILE currentNode <> 0 DO
+	currentNode := currentNode.Next;
+	currentCount := currentCount + 1;
+END_WHILE;
+
+Size := currentCount;]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

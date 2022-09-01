@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
+  <POU Name="QueueNode" Id="{5727fc62-2cdf-415b-88d9-0a182275d5b3}" SpecialFunc="None">
+    <Declaration><![CDATA[{attribute 'linkalways'}
+{attribute 'no_explicit_call' := 'do not call this POU directly'}
+{attribute 'enable_dynamic_creation'}
+FUNCTION_BLOCK QueueNode IMPLEMENTS I_QueueNode
+VAR
+	internalBuffer : POINTER TO BYTE;
+	internalBufferSize : UDINT;
+	nextNode : I_QueueNode;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="Constructor" Id="{99d07663-8d19-444c-b251-386e086d188e}" />
+    <Folder Name="Private" Id="{8bc744f6-366f-4502-91dd-8a6e8367ac86}" />
+    <Method Name="CopyInternalBufferToDestination" Id="{435865c6-abf1-4aa0-a18b-a0a4ddf72f61}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD PRIVATE CopyInternalBufferToDestination
+VAR_INPUT
+	DestinationAddress : PVOID;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[memcpy(DestinationAddress,internalBuffer,internalBufferSize);
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CopySourceToInternalBuffer" Id="{6750840f-f21a-4729-9758-5829588ca080}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD PRIVATE CopySourceToInternalBuffer
+VAR_INPUT
+	SourceAddress : PVOID;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[memcpy(internalBuffer,SourceAddress,internalBufferSize);
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="DeleteInternalBuffer" Id="{9d425e50-5d59-4bce-ac65-98e7adb2fa57}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD PRIVATE DeleteInternalBuffer
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF internalBuffer <> 0 THEN
+	__DELETE(internalBuffer);
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Destroy" Id="{52151c94-c18b-4c21-b66f-3c84449673c0}">
+      <Declaration><![CDATA[METHOD PUBLIC Destroy
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[DeleteInternalBuffer();
+__Delete(this);]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="FB_init" Id="{8f96ec32-be93-451a-9997-77c5ca2fa316}" FolderPath="Constructor\">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
+VAR_INPUT
+	bInitRetains : BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
+	bInCopyCode : BOOL;  // if TRUE, the instance afterwards gets moved into the copy code (online change)
+	Source : ANY;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[MakeInternalBufferOfSize(DINT_TO_UDINT(Source.diSize));
+CopySourceToInternalBuffer(Source.pValue);]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Get" Id="{9d220e81-9b34-496e-ba7e-f8a9c727acaa}">
+      <Declaration><![CDATA[METHOD PUBLIC Get : BOOL;
+VAR_INPUT
+	Destination : ANY;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT IsInternalBufferSameSizeAs(DINT_TO_UDINT(Destination.diSize)) THEN
+	RETURN;
+END_IF
+
+CopyInternalBufferToDestination(Destination.pValue);]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="IsInternalBufferSameSizeAs" Id="{df860d3d-74b9-4d0c-af51-1d764004b71e}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD PRIVATE IsInternalBufferSameSizeAs : BOOL
+VAR_INPUT
+	Size : UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF internalBuffer = 0 THEN
+	RETURN;
+END_IF
+
+IF internalBufferSize <> Size THEN
+	RETURN;
+END_IF
+
+IsInternalBufferSameSizeAs := TRUE;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="MakeInternalBufferOfSize" Id="{8a46851a-86e2-41f9-8e05-dc45af79cb58}" FolderPath="Private\">
+      <Declaration><![CDATA[METHOD PRIVATE MakeInternalBufferOfSize
+VAR_INPUT
+	Size : UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[internalBufferSize := Size;
+internalBuffer := __NEW(BYTE, internalBufferSize);
+]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Next" Id="{8e1ddf3a-4b70-487f-b591-2b5bcaf89b07}">
+      <Declaration><![CDATA[PROPERTY PUBLIC Next : I_QueueNode]]></Declaration>
+      <Get Name="Get" Id="{46ce132e-8357-4d98-8acf-9c947d626300}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Next := nextNode;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{f2ac2e7c-d2be-4808-906e-c82174eb21b6}">
+        <Declaration><![CDATA[PUBLIC 
+VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[nextNode := Next;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+  </POU>
+</TcPlcObject>
