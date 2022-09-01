@@ -8,6 +8,7 @@ FUNCTION_BLOCK QueueNode IMPLEMENTS I_QueueNode
 VAR
 	internalBuffer : POINTER TO BYTE;
 	internalBufferSize : UDINT;
+	sourceDataType : T_MAXSTRING;
 	nextNode : I_QueueNode;
 END_VAR
 ]]></Declaration>
@@ -38,6 +39,17 @@ END_VAR
 ]]></ST>
       </Implementation>
     </Method>
+    <Property Name="DataType" Id="{76596a96-9806-413f-9f7d-9c9729ac45ec}">
+      <Declaration><![CDATA[PROPERTY PUBLIC DataType : T_MaxString]]></Declaration>
+      <Get Name="Get" Id="{675c8e2c-4110-4548-b5e3-281ad742157f}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[DataType := sourceDataType;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
     <Method Name="DeleteInternalBuffer" Id="{9d425e50-5d59-4bce-ac65-98e7adb2fa57}" FolderPath="Private\">
       <Declaration><![CDATA[METHOD PRIVATE DeleteInternalBuffer
 ]]></Declaration>
@@ -65,10 +77,13 @@ VAR_INPUT
 	bInCopyCode : BOOL;  // if TRUE, the instance afterwards gets moved into the copy code (online change)
 	Source : ANY;
 END_VAR
-]]></Declaration>
+VAR
+	transform : FB_JsonReadWriteDataType;
+END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[MakeInternalBufferOfSize(DINT_TO_UDINT(Source.diSize));
-CopySourceToInternalBuffer(Source.pValue);]]></ST>
+CopySourceToInternalBuffer(Source.pValue);
+sourceDataType := transform.GetDataTypeNameByAddress(Source.diSize,Source.pValue);]]></ST>
       </Implementation>
     </Method>
     <Method Name="Get" Id="{9d220e81-9b34-496e-ba7e-f8a9c727acaa}">

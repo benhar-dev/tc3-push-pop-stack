@@ -5,19 +5,28 @@
 VAR
 	
 	queue : Queue;
+	size : UINT;
 	
+	// showing the use of the queue for the same datatype
+	trigger : BOOL;
 	position1 : Coordinate3D :=  (x:=3, y:=8, z:=-1);
 	position2 : Coordinate3D :=  (x:=9, y:=1, z:=0);
-	
-	trigger : BOOL;
-	
-	size : UINT;
 	currentPosition : Coordinate3D;
+	
+	// showing the same queue can be used for anything at any time!
+	trigger2 : BOOL;	
+	myInt : INT := 123;
+	myBool : BOOL := TRUE;
+	myPosition : Coordinate3D :=  (x:=3, y:=8, z:=-1);
+	poppedInt : INT;
+	poppedBool : BOOL;
+	poppedPosition : Coordinate3D;	
 	
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[IF trigger THEN
+      <ST><![CDATA[// example showing the queue can hold any number of the same type. 
+IF trigger THEN
 	
 	trigger := FALSE;
 	
@@ -27,7 +36,31 @@ END_VAR
 	size := queue.Size(); // size 2
 	queue.Pop(currentPosition); // (x:=3, y:=8, z:=-1)
 	size := queue.Size(); // size 1
+	queue.Pop(currentPosition); // (x:=9, y:=1, z:=0)
+	size := queue.Size(); // size 0
 
+END_IF
+
+// example showing the queue can hold any number of any type all at the same time. 
+IF trigger2 THEN
+	
+	trigger2 := FALSE;
+	
+	queue.Push(myInt);
+	queue.Push(myBool);
+	queue.Push(myPosition);
+	
+	size := queue.Size(); // size 3
+	queue.Pop(poppedBool); // The datatype is wrong as the first push was an INT so nothing is popped.
+	
+	size := queue.Size(); // size 3
+	queue.Pop(poppedInt); // 123
+	size := queue.Size(); // size 2
+	queue.Pop(poppedBool); // true
+	size := queue.Size(); // size 1
+	queue.Pop(poppedPosition); // (x:=3, y:=8, z:=-1)
+	size := queue.Size(); // size 0
+	
 END_IF]]></ST>
     </Implementation>
   </POU>

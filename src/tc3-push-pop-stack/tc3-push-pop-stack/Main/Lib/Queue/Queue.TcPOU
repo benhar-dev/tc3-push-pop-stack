@@ -12,16 +12,59 @@ END_VAR
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
+    <Folder Name="Destructor" Id="{07801cfe-e9f1-4f70-9193-b414630971ad}" />
+    <Method Name="Clear" Id="{ceb7ff56-02be-4942-a18b-24e6bdf422bf}">
+      <Declaration><![CDATA[METHOD PUBLIC Clear
+VAR_INPUT
+END_VAR
+VAR
+	current, next : I_QueueNode;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF head = 0 THEN	
+	RETURN;
+END_IF
+
+current := head; 
+
+WHILE current.Next <> 0 DO
+	next := current.next; 
+	current.Destroy();
+	current := next;
+END_WHILE;
+	
+current.Destroy();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="FB_exit" Id="{d3f33f7d-ac2f-4275-af05-b8ab00d9c89d}" FolderPath="Destructor\">
+      <Declaration><![CDATA[METHOD FB_exit : BOOL
+VAR_INPUT
+	bInCopyCode : BOOL; // if TRUE, the exit method is called for exiting an instance that is copied afterwards (online change).
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF bInCopyCode THEN
+	RETURN;
+END_IF
+
+Clear();]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="Pop" Id="{1ebc705c-ca50-401d-8bfc-812a17ac732a}">
       <Declaration><![CDATA[METHOD PUBLIC Pop : BOOL;
 VAR_INPUT
 	Destination : ANY;
 END_VAR
 VAR
+	transform : FB_JsonReadWriteDataType;
 	next : I_QueueNode;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF head = 0 THEN
+	RETURN;
+END_IF
+
+IF head.DataType <> transform.GetDataTypeNameByAddress(Destination.diSize,Destination.pValue) THEN
 	RETURN;
 END_IF
 

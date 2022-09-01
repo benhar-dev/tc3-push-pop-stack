@@ -2,6 +2,12 @@
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.11">
   <Itf Name="I_QueueNode" Id="{6b75ffa8-a79b-4321-92d0-ec8c46d024a4}">
     <Declaration><![CDATA[INTERFACE I_QueueNode]]></Declaration>
+    <Property Name="DataType" Id="{6b8d9287-5a35-48a2-b3ff-1f347497c788}">
+      <Declaration><![CDATA[PROPERTY PUBLIC DataType : T_MaxString]]></Declaration>
+      <Get Name="Get" Id="{530f547b-5527-442c-9dc2-d053441fdf66}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
     <Method Name="Destroy" Id="{f562c5a5-3c44-4553-882f-168d43d6e471}">
       <Declaration><![CDATA[METHOD PUBLIC Destroy
 VAR_INPUT
